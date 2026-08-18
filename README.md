@@ -66,15 +66,17 @@ DeepSeek Harness 模型侧工具插件：读取 10x Genomics `.h5` 矩阵文件�
 
 ## 性能基准
 
-只读头部 vs 读取全量（本机实测，Python 3.14 + h5py 3.16，10x 官方 PBMC 3k 数据集
-`pbmc_granulocyte_sorted_3k_filtered_feature_bc_matrix.h5`，38.8 MB，134,920 × 2,711，24,511,186 个非零元素）：
+只读头部 vs 读取全量（本机实测，Python 3.14 + h5py 3.16）。基准数据为 10x Genomics 公开数据集
+*3k PBMCs from a Healthy Donor（Granulocytes removed through cell sorting）* 的 **Multiome（ATAC + 基因表达）版**
+（Cell Ranger ARC 2.0.0 处理，[官网下载](https://cf.10xgenomics.com/samples/cell-arc/2.0.0/pbmc_granulocyte_sorted_3k/pbmc_granulocyte_sorted_3k_filtered_feature_bc_matrix.h5)）：
+文件 38.8 MB，矩阵 134,920 特征 × 2,711 细胞（36,601 个基因 + 98,319 个 ATAC peak），24,511,186 个非零元素：
 
 | 做法 | 读取量 | 耗时 |
 |---|---|---|
 | 只读 `matrix/shape`（本插件） | 8 字节 | **35 ms** |
 | 读取完整矩阵（`data`+`indices`+`indptr`） | 2451 万个非零元素 | **520 ms** |
 
-工作区构造的 v0/v2/chunked/shuffle 各布局测试矩阵，头部读取在 **0.77–2.12 ms**。
+另外用构造的 v0/v2/chunked/shuffle 各布局测试矩阵实测，头部读取在 **0.77–2.12 ms**。
 
 ## 卸载
 
